@@ -1,24 +1,31 @@
-import pages from "@hono/vite-cloudflare-pages";
 import devServer from "@hono/vite-dev-server";
 import adapter from "@hono/vite-dev-server/cloudflare";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  mode: "server",
+  ssr: {
+    noExternal: process.env.NODE_ENV !== "development" || undefined,
+    resolve: {
+      externalConditions: ["workerd", "worker"],
+    },
+    target: "webworker",
+  },
   build: {
+    ssr: true,
     rollupOptions: {
       input: {
+        server: "src/index.tsx",
         client: "src/client.tsx",
       },
       output: {
-        entryFileNames: () => {
-          return "static/[name].js";
+        entryFileNames: ({ name }) => {
+          if (name === "client") return "static/[name].js";
+          return "[name].js";
         },
       },
     },
   },
   plugins: [
-    pages(),
     devServer({
       adapter,
       entry: "src/index.tsx",

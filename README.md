@@ -1,6 +1,8 @@
 # hono-ssr-react
 
-https://hono-ssr-react.pages.dev/
+https://hono-ssr-react.mofon001.workers.dev/
+
+Cloudflare Workers + Hono + Vite + React sample for getting weather forecasts and performing SSR
 
 # Example
 
@@ -53,7 +55,7 @@ app.get("*", async (c) => {
     }
     return c.html(data.map((v) => new TextDecoder().decode(v)).join(""));
   }
-  return c.newResponse(stream, {
+  return c.body(stream, {
     headers: {
       "Content-Type": "text/html",
     },
@@ -165,4 +167,43 @@ const Page = () => {
   );
 };
 export default Page;
+```
+
+- vite.config.ts
+
+```ts
+import devServer from "@hono/vite-dev-server";
+import adapter from "@hono/vite-dev-server/cloudflare";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  ssr: {
+    noExternal: process.env.NODE_ENV !== "development" ? true : undefined,
+    resolve: {
+      externalConditions: ["workerd", "worker"],
+    },
+    target: "webworker",
+  },
+  build: {
+    ssr: true,
+    rollupOptions: {
+      input: {
+        server: "src/index.tsx",
+        client: "src/client.tsx",
+      },
+      output: {
+        entryFileNames: ({ name }) => {
+          if (name === "client") return "static/[name].js";
+          return "[name].js";
+        },
+      },
+    },
+  },
+  plugins: [
+    devServer({
+      adapter,
+      entry: "src/index.tsx",
+    }),
+  ],
+});
 ```

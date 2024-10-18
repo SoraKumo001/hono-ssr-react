@@ -44,7 +44,7 @@ app.get("*", async (c) => {
     }
     return c.html(data.map((v) => new TextDecoder().decode(v)).join(""));
   }
-  return c.newResponse(stream, {
+  return c.body(stream, {
     headers: {
       "Content-Type": "text/html",
     },
