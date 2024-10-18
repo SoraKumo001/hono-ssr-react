@@ -5,5 +5,8 @@
   "workspaces": [
     "packages/*"
   ],
-  "packageManager": "pnpm@9.12.2"
+  "main": "index.js",
+  "repository": "https://github.com/SoraKumo001/hono-ssr-react",
+  "author": "SoraKumo <info@croud.jp>",
+  "license": "MIT"
 }
