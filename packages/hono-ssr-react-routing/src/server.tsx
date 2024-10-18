@@ -3,12 +3,6 @@ import { renderToReadableStream } from "react-dom/server.browser";
 import { App } from "./App";
 import { RouterProvider } from "./RouterProvider";
 
-declare module "react-dom/server.browser" {
-  interface ReactDOMServerReadableStream extends ReadableStream {
-    [Symbol.asyncIterator](): AsyncIterableIterator<any>;
-  }
-}
-
 type Env = {};
 
 const app = new Hono<Env>();
@@ -21,6 +15,22 @@ app.get("*", async (c) => {
         <head>
           <meta charSet="utf-8" />
           <meta content="width=device-width, initial-scale=1" name="viewport" />
+          {import.meta.env.DEV && (
+            <>
+              <script
+                type="module"
+                dangerouslySetInnerHTML={{
+                  __html: `
+            import RefreshRuntime from "/@react-refresh"
+            RefreshRuntime.injectIntoGlobalHook(window)
+            window.$RefreshReg$ = () => {}
+            window.$RefreshSig$ = () => (type) => type
+            window.__vite_plugin_react_preamble_installed__ = true`,
+                }}
+              />
+              <script type="module" src="/@vite/client" />
+            </>
+          )}
           <link
             rel="stylesheet"
             href="https://cdn.simplecss.org/simple.min.css"
@@ -45,13 +55,6 @@ app.get("*", async (c) => {
     );
     await stream.allReady;
 
-    if (import.meta.env.DEV) {
-      const data = [];
-      for await (const chunk of stream) {
-        data.push(chunk);
-      }
-      return c.html(data.map((v) => new TextDecoder().decode(v)).join(""));
-    }
     return c.body(stream, {
       headers: {
         "Content-Type": "text/html",

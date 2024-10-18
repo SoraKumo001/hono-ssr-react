@@ -24,6 +24,7 @@ export default defineConfig({
   },
   plugins: [
     devServer({
+      injectClientScript: false,
       adapter,
       entry: "src/server.tsx",
     }),

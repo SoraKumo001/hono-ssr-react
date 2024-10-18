@@ -1,7 +1,7 @@
 import devServer from "@hono/vite-dev-server";
 import adapter from "@hono/vite-dev-server/cloudflare";
 import { defineConfig } from "vite";
-
+import react from "@vitejs/plugin-react";
 export default defineConfig({
   ssr: {
     noExternal: process.env.NODE_ENV !== "development" || undefined,
@@ -23,7 +23,9 @@ export default defineConfig({
     },
   },
   plugins: [
+    react(),
     devServer({
+      injectClientScript: false,
       adapter,
       entry: "src/server.tsx",
     }),
