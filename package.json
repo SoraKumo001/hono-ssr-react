@@ -1,30 +1,9 @@
 {
-  "name": "hono-ssr-react",
+  "name": "root",
   "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "wrangler dev",
-    "deploy": "wrangler deploy"
-  },
-  "dependencies": {
-    "hono": "^4.6.5",
-    "next-ssr": "^1.1.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241011.0",
-    "@hono/vite-cloudflare-pages": "^0.4.2",
-    "@hono/vite-dev-server": "^0.16.0",
-    "@types/react": "^18.3.11",
-    "@types/react-dom": "^18.3.1",
-    "vite": "^5.4.9",
-    "wrangler": "^3.80.5"
-  },
-  "author": "SoraKumo <info@croud.jp>",
-  "license": "MIT",
-  "main": "index.js",
-  "repository": "https://github.com/SoraKumo001/hono-ssr-react"
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "packageManager": "pnpm@9.12.2"
 }

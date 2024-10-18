@@ -13,10 +13,7 @@ export default defineConfig({
   build: {
     ssr: true,
     rollupOptions: {
-      input: {
-        server: "src/index.tsx",
-        client: "src/client.tsx",
-      },
+      input: ["src/server.tsx", "src/client.tsx"],
       output: {
         entryFileNames: ({ name }) => {
           if (name === "client") return "static/[name].js";
@@ -28,7 +25,7 @@ export default defineConfig({
   plugins: [
     devServer({
       adapter,
-      entry: "src/index.tsx",
+      entry: "src/server.tsx",
     }),
   ],
 });
