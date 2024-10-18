@@ -6,7 +6,7 @@ Cloudflare Workers + Hono + Vite + React sample for getting weather forecasts an
 
 # Example
 
-- src/index.tsx
+- src/server.tsx
 
 ```tsx
 import { Hono } from "hono";
@@ -178,7 +178,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   ssr: {
-    noExternal: process.env.NODE_ENV !== "development" ? true : undefined,
+    noExternal: process.env.NODE_ENV !== "development" || undefined,
     resolve: {
       externalConditions: ["workerd", "worker"],
     },
@@ -187,10 +187,7 @@ export default defineConfig({
   build: {
     ssr: true,
     rollupOptions: {
-      input: {
-        server: "src/index.tsx",
-        client: "src/client.tsx",
-      },
+      input: ["src/server.tsx", "src/client.tsx"],
       output: {
         entryFileNames: ({ name }) => {
           if (name === "client") return "static/[name].js";
@@ -202,7 +199,7 @@ export default defineConfig({
   plugins: [
     devServer({
       adapter,
-      entry: "src/index.tsx",
+      entry: "src/server.tsx",
     }),
   ],
 });

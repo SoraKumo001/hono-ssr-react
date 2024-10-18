@@ -1,17 +1,19 @@
-# hono-ssr-react
+# hono-ssr-react-routing
 
-https://hono-ssr-react.mofon001.workers.dev/
+https://hono-ssr-react-routing.mofon001.workers.dev/
 
-Cloudflare Workers + Hono + Vite + React sample for getting weather forecasts and performing SSR
+Cloudflare Workers + Hono + Vite + React sample for getting weather forecasts and performing SSR  
+Routing is implemented without libraries
 
 # Example
 
-- src/index.tsx
+- src/server.tsx
 
 ```tsx
 import { Hono } from "hono";
 import { renderToReadableStream } from "react-dom/server.browser";
 import { App } from "./App";
+import { RouterProvider } from "./RouterProvider";
 
 declare module "react-dom/server.browser" {
   interface ReactDOMServerReadableStream extends ReadableStream {
@@ -24,42 +26,55 @@ type Env = {};
 const app = new Hono<Env>();
 
 app.get("*", async (c) => {
-  const stream = await renderToReadableStream(
-    <html>
-      <head>
-        <meta charSet="utf-8" />
-        <meta content="width=device-width, initial-scale=1" name="viewport" />
-        <link
-          rel="stylesheet"
-          href="https://cdn.simplecss.org/simple.min.css"
-        />
-        {import.meta.env.PROD ? (
-          <script type="module" src="/static/client.js"></script>
-        ) : (
-          <script type="module" src="/src/client.tsx"></script>
-        )}
-      </head>
-      <body>
-        <div id="root">
-          <App />
-        </div>
-      </body>
-    </html>
-  );
-  await stream.allReady;
+  try {
+    const url = new URL(c.req.url);
+    const stream = await renderToReadableStream(
+      <html>
+        <head>
+          <meta charSet="utf-8" />
+          <meta content="width=device-width, initial-scale=1" name="viewport" />
+          <link
+            rel="stylesheet"
+            href="https://cdn.simplecss.org/simple.min.css"
+          />
+          {import.meta.env.PROD ? (
+            <script type="module" src="/static/client.js"></script>
+          ) : (
+            <script type="module" src="/src/client.tsx"></script>
+          )}
+        </head>
+        <body>
+          <div id="root">
+            <RouterProvider pathname={url.pathname}>
+              <App />
+            </RouterProvider>
+          </div>
+        </body>
+      </html>,
+      {
+        onError: () => {},
+      }
+    );
+    await stream.allReady;
 
-  if (import.meta.env.DEV) {
-    const data = [];
-    for await (const chunk of stream) {
-      data.push(chunk);
+    if (import.meta.env.DEV) {
+      const data = [];
+      for await (const chunk of stream) {
+        data.push(chunk);
+      }
+      return c.html(data.map((v) => new TextDecoder().decode(v)).join(""));
     }
-    return c.html(data.map((v) => new TextDecoder().decode(v)).join(""));
+    return c.body(stream, {
+      headers: {
+        "Content-Type": "text/html",
+      },
+    });
+  } catch (e) {
+    if (e instanceof Error && e.message === "Not found") {
+      return c.notFound();
+    }
+    throw e;
   }
-  return c.body(stream, {
-    headers: {
-      "Content-Type": "text/html",
-    },
-  });
 });
 
 export default app;
@@ -68,22 +83,61 @@ export default app;
 - src/App.tsx
 
 ```tsx
-import { SSRProvider } from "next-ssr";
-import Page from "./page";
+import { useSSR } from "next-ssr";
+import { useRouter } from "../RouterProvider";
 
-export function App() {
-  return (
-    <SSRProvider>
-      <Page />
-    </SSRProvider>
-  );
+interface Center {
+  name: string;
+  enName: string;
+  officeName?: string;
+  children?: string[];
+  parent?: string;
+  kana?: string;
 }
+interface Centers {
+  [key: string]: Center;
+}
+
+const fetchCenters = (): Promise<Centers> =>
+  fetch(`https://www.jma.go.jp/bosai/common/const/area.json`)
+    .then((r) => r.json())
+    .then(
+      // Additional weights (500 ms)
+      (r) =>
+        new Promise((resolve) => setTimeout(() => resolve(r as Centers), 500))
+    );
+
+const Page = () => {
+  const router = useRouter();
+  const { data } = useSSR<Centers>(fetchCenters, { key: "centers" });
+  if (!data) return <div>loading</div>;
+  return (
+    <div>
+      {data &&
+        Object.entries(data.offices).map(([code, { name }]) => (
+          <div key={code}>
+            <a
+              onClick={(e) => {
+                e.preventDefault();
+                router.push(`/weather/${code}`);
+              }}
+              href={`/weather/${code}`}
+            >
+              {name}
+            </a>
+          </div>
+        ))}
+    </div>
+  );
+};
+export default Page;
 ```
 
-- src/page/index.tsx
+- src/pages/weather.tsx
 
 ```tsx
 import { useSSR } from "next-ssr";
+import { useRouter } from "../RouterProvider";
 
 export interface WeatherType {
   publishingOffice: string;
@@ -112,7 +166,9 @@ const fetchWeather = (id: number): Promise<WeatherType> =>
 /**
  * Components for displaying weather information
  */
-const Weather = ({ code }: { code: number }) => {
+
+const Page = ({ code }: { code: number }) => {
+  const router = useRouter();
   const { data, reload, isLoading } = useSSR<WeatherType>(
     () => fetchWeather(code),
     { key: code }
@@ -137,6 +193,15 @@ const Weather = ({ code }: { code: number }) => {
           loading
         </div>
       )}
+      <a
+        href=".."
+        onClick={(e) => {
+          e.preventDefault();
+          router.push("..");
+        }}
+      >
+        ⏪️Home
+      </a>
       <h1>{targetArea}</h1>
       <button onClick={reload}>Reload</button>
       <div>
@@ -150,22 +215,6 @@ const Weather = ({ code }: { code: number }) => {
   );
 };
 
-/**
- * Page display components
- */
-
-const Page = () => {
-  return (
-    <>
-      {/* Chiba  */}
-      <Weather code={120000} />
-      {/* Tokyo */}
-      <Weather code={130000} />
-      {/* Kanagawa */}
-      <Weather code={140000} />
-    </>
-  );
-};
 export default Page;
 ```
 
