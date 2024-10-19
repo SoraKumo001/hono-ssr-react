@@ -18,11 +18,9 @@ const fetchWeather = (id: number): Promise<WeatherType> =>
   )
     .then((r) => r.json())
     .then(
-      // Additional weights (500 ms)
+      // Additional weights (0 ms)
       (r) =>
-        new Promise((resolve) =>
-          setTimeout(() => resolve(r as WeatherType), 500)
-        )
+        new Promise((resolve) => setTimeout(() => resolve(r as WeatherType), 0))
     );
 
 /**

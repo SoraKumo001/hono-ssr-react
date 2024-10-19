@@ -17,9 +17,9 @@ const fetchCenters = (): Promise<Centers> =>
   fetch(`https://www.jma.go.jp/bosai/common/const/area.json`)
     .then((r) => r.json())
     .then(
-      // Additional weights (500 ms)
+      // Additional weights (0 ms)
       (r) =>
-        new Promise((resolve) => setTimeout(() => resolve(r as Centers), 500))
+        new Promise((resolve) => setTimeout(() => resolve(r as Centers), 0))
     );
 
 const Page = () => {

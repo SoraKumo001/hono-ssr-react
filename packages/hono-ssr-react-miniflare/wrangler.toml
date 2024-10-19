@@ -1,4 +1,4 @@
-name = "hono-ssr-react-routing"
+name = "hono-ssr-react-miniflare"
 compatibility_date = "2024-09-25"
 main = "./dist/server.js"
 assets = { directory = "./dist"}

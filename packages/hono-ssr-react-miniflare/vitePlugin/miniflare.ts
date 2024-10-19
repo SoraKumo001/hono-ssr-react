@@ -36,6 +36,7 @@ export const createMiniflare = async (
   const miniflareOption: MiniflareOptions = {
     compatibilityDate: "2024-08-21",
     compatibilityFlags: ["nodejs_compat"],
+    cachePersist: ".wrangler",
     modulesRoot: fileURLToPath(new URL("./", import.meta.url)),
     modules: [
       {

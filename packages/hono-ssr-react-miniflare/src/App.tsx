@@ -2,8 +2,10 @@ import { SSRProvider } from "next-ssr";
 import Home from "./pages";
 import Weather from "./pages/weather";
 import { useRouter } from "./RouterProvider";
+import { useRootContext } from "remix-provider";
 
 export function App() {
+  const { count } = useRootContext<{ count: number }>();
   const router = useRouter();
   const paths = router.pathname.slice(1).split(/\//);
 
@@ -15,5 +17,10 @@ export function App() {
     ) : undefined;
   if (!page) throw new Error("Not found");
 
-  return <SSRProvider>{page}</SSRProvider>;
+  return (
+    <SSRProvider>
+      <div>Miniflare Cache Test:{count}</div>
+      {page}
+    </SSRProvider>
+  );
 }
