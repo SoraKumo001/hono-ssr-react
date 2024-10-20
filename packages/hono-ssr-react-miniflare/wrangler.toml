@@ -1,6 +1,6 @@
 name = "hono-ssr-react-miniflare"
 compatibility_date = "2024-09-25"
-main = "./dist/server.js"
+main = "./src/server.tsx"
 assets = { directory = "./dist"}
 
 [observability]

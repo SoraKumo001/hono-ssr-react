@@ -14,7 +14,7 @@ export const Html = ({
       <head>
         <meta charSet="utf-8" />
         <meta content="width=device-width, initial-scale=1" name="viewport" />
-        {import.meta.env.DEV && (
+        {import.meta.env?.DEV && (
           <>
             <script
               type="module"
@@ -34,10 +34,10 @@ export const Html = ({
           rel="stylesheet"
           href="https://cdn.simplecss.org/simple.min.css"
         />
-        {import.meta.env.PROD ? (
-          <script type="module" src="/static/client.js"></script>
-        ) : (
+        {import.meta.env?.DEV ? (
           <script type="module" src="/src/client.tsx"></script>
+        ) : (
+          <script type="module" src="/static/client.js"></script>
         )}
       </head>
       <body>

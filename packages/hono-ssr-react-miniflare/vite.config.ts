@@ -3,13 +3,11 @@ import react from "@vitejs/plugin-react";
 import { devServer } from "./vitePlugin";
 export default defineConfig({
   build: {
-    ssr: true,
     rollupOptions: {
-      input: ["src/server.tsx", "src/client.tsx"],
+      input: ["src/client.tsx"],
       output: {
-        entryFileNames: ({ name }) => {
-          if (name === "client") return "static/[name].js";
-          return "[name].js";
+        entryFileNames: () => {
+          return "static/[name].js";
         },
       },
     },
