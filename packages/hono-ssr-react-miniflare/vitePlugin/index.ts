@@ -40,7 +40,7 @@ export function devServer(params?: DevServerOptions): VitePlugin {
     configureServer: async (viteDevServer) => {
       if (!viteDevServer.config.server.preTransformRequests) return undefined;
       const runner =
-        globals.__runner ?? (await createMiniflare(viteDevServer, bundle));
+        globals.__runner ?? (await createMiniflare({ viteDevServer, bundle }));
       globals.__runner = runner;
       process.on("exit", () => {
         runner.dispose();
