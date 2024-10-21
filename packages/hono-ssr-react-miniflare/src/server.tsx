@@ -1,8 +1,7 @@
 import { Hono } from "hono";
 import { renderToReadableStream } from "react-dom/server";
-import { App } from "./App";
-import { Html } from "./Html";
-import { ServerProvider } from "remix-provider";
+import { App } from "./Components/App";
+import { Html } from "./Components/Html";
 
 type Env = {};
 
@@ -26,19 +25,17 @@ const getValue = async () => {
   return value;
 };
 
-app.get("*", async (c) => {
+app.get("/count", async (c) => {
   const count = await getValue();
+  return c.json({ count });
+});
+
+app.get("*", async (c) => {
   try {
     const stream = await renderToReadableStream(
-      <ServerProvider
-        value={{
-          count,
-        }}
-      >
-        <Html url={c.req.url}>
-          <App />
-        </Html>
-      </ServerProvider>,
+      <Html url={c.req.url}>
+        <App />
+      </Html>,
       {
         onError: () => {},
       }

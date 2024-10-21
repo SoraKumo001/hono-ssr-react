@@ -1,5 +1,5 @@
 import { useSSR } from "next-ssr";
-import { useRouter } from "../RouterProvider";
+import { useRouter } from "../Components/RouterProvider";
 
 interface Center {
   name: string;

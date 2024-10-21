@@ -1,7 +1,7 @@
 import { hydrateRoot } from "react-dom/client";
-import { App } from "./App";
-import { RouterProvider } from "./RouterProvider";
-import { Html } from "./Html";
+import { App } from "./Components/App";
+import { RouterProvider } from "./Components/RouterProvider";
+import { Html } from "./Components/Html";
 
 const rootElement = document.getElementById("root")!;
 hydrateRoot(

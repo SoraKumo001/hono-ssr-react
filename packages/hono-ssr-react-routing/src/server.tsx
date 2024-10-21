@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { renderToReadableStream } from "react-dom/server.browser";
-import { App } from "./App";
-import { RouterProvider } from "./RouterProvider";
-import { Html } from "./Html";
+import { App } from "./Components/App";
+import { RouterProvider } from "./Components/RouterProvider";
+import { Html } from "./Components/Html";
 
 type Env = {};
 

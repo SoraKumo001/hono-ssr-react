@@ -9,22 +9,22 @@ import {
 } from "react";
 
 type RouterContext = {
-  pathname: string;
+  url: URL;
   push: (pathname: string) => void;
 };
 
 const context = createContext<RouterContext>(undefined as never);
 export const RouterProvider = ({
   children,
-  pathname,
+  url,
 }: {
   children: ReactNode;
-  pathname: string;
+  url: string;
 }) => {
-  const [_pathname, setPathName] = useState(pathname);
+  const [_url, setUrl] = useState(url);
   useEffect(() => {
     const listener = () => {
-      setPathName(window.location.pathname);
+      setUrl(window.location.href);
     };
     addEventListener("popstate", listener);
     return () => {
@@ -34,11 +34,12 @@ export const RouterProvider = ({
   const push = useCallback((pathname: string) => {
     const url = new URL(pathname, window.location.href);
     history.pushState({}, "", url.pathname);
-    setPathName(url.pathname);
+    setUrl(url.href);
   }, []);
   const value = useMemo(() => {
-    return { pathname: _pathname, push };
-  }, [_pathname, push]);
+    const url = new URL(_url);
+    return { url, push };
+  }, [_url, push]);
   return <context.Provider value={value}>{children}</context.Provider>;
 };
 export const useRouter = () => {

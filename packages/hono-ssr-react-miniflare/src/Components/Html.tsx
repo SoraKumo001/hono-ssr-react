@@ -8,7 +8,6 @@ export const Html = ({
   url: string;
   children: ReactNode;
 }) => {
-  const _url = new URL(url);
   return (
     <html>
       <head>
@@ -42,7 +41,7 @@ export const Html = ({
       </head>
       <body>
         <div id="root">
-          <RouterProvider pathname={_url.pathname}>{children}</RouterProvider>
+          <RouterProvider url={url}>{children}</RouterProvider>
         </div>
       </body>
     </html>
