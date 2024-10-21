@@ -100,6 +100,9 @@ export const createMiniflare = async ({
     unsafeModuleFallbackService: (request) =>
       unsafeModuleFallbackService(viteDevServer, request),
     unsafeEvalBinding: "__viteUnsafeEval",
+    bindings: {
+      __miniflare: true,
+    },
     serviceBindings: {
       __viteFetchModule: async (request) => {
         const args = (await request.json()) as Parameters<

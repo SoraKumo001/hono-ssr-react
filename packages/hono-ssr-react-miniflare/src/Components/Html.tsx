@@ -3,9 +3,17 @@ import { RouterProvider } from "./RouterProvider";
 
 export const Html = ({
   url,
+  host,
+  protocol,
+  requestInit,
+  self,
   children,
 }: {
   url: string;
+  host?: string;
+  protocol?: string;
+  requestInit?: RequestInit;
+  self?: Fetcher["fetch"];
   children: ReactNode;
 }) => {
   return (
@@ -41,7 +49,15 @@ export const Html = ({
       </head>
       <body>
         <div id="root">
-          <RouterProvider url={url}>{children}</RouterProvider>
+          <RouterProvider
+            url={url}
+            host={host}
+            protocol={protocol}
+            requestInit={requestInit}
+            fetch={self}
+          >
+            {children}
+          </RouterProvider>
         </div>
       </body>
     </html>

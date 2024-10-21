@@ -45,7 +45,6 @@ export function devServer(params?: DevServerOptions): VitePlugin {
       process.on("exit", () => {
         runner.dispose();
       });
-
       viteDevServer.watcher.on("change", (file) => {
         if (file === path.resolve(__dirname, "miniflare_module.ts")) {
           runner.dispose();
